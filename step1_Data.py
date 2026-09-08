@@ -1,37 +1,36 @@
 import pandas as pd
-import random
+import random as rnd
 
-# generating fake data for testing zobaze pos logic locally
-def make_dummy_sales(target_file="data/zobaze_sales_export.csv", row_count=50000):
-    print("starting data gen...")
+# gonna just make the data here to test the app
+def create_my_fake_sales_csv(name_of_file="data/zobaze_sales_export.csv", how_many_rows=50000):
+    print("making data now wait a sec...")
     
-    # common items we sell in the shop
-    inventory_stuff = [
-        "Cardamom 100g", "Basmati Rice 1kg", 
-        "Tur Dal Loose", "Lux Soap", 
-        "Sugar 1kg", "Tata Tea Gold", "Aashirvaad Atta 5kg"
-    ]
+    my_shop_items = ["Cardamom 100g", "Basmati Rice 1kg", "Tur Dal Loose", "Lux Soap", "Sugar 1kg", "Tata Tea Gold", "Aashirvaad Atta 5kg"]
     
-    row_list = []
+    # making separate lists instead of dicts cause it's easier to think about
+    ids = []
+    items = []
+    qtys = []
+    prices = []
     
-    for count in range(row_count):
-        # building each record manually
-        item_chosen = random.choice(inventory_stuff)
-        q = random.randint(1, 5)
-        p = random.randint(20, 500)
+    c = 0
+    while c < how_many_rows:
+        ids.append( "TXN-" + str(1000 + c) )
+        items.append( rnd.choice(my_shop_items) )
+        qtys.append( rnd.randint(1, 5) )
+        prices.append( rnd.randint(20, 500) )
+        c = c + 1
         
-        single_record = {
-            "txn_id": f"TXN-{1000 + count}",
-            "item_name": item_chosen,
-            "qty": q,
-            "price": p
-        }
-        row_list.append(single_record)
-        
-    export_df = pd.DataFrame(row_list)
-    export_df.to_csv(target_file, index=False)
+    # smush it all together into the dataframe
+    final_table = pd.DataFrame({
+        'txn_id': ids,
+        'item_name': items,
+        'qty': qtys,
+        'price': prices
+    })
     
-    print(f"all done. wrote {row_count} lines to {target_file}")
+    final_table.to_csv(name_of_file, index=False)
+    print("ok done. saved " + str(how_many_rows) + " rows.")
 
-if __name__ == "__main__":
-    make_dummy_sales()
+if __name__ == '__main__':
+    create_my_fake_sales_csv()
