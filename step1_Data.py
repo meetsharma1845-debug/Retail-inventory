@@ -1,25 +1,43 @@
-import pandas as pd
 import random
-from datetime import datetime, timedelta
+from pathlib import Path
 
-def generate_pos_data(filename="zobaze_sales_export.csv", rows=50000):
-    print("Generating POS data...")
-    products = ["Cardamom", "Basmati Rice", "Tur Dal", "Soap", "Sugar", "Tea Powder"]
-    
-    data = []
-    for i in range(rows):
-        data.append({
-            "TransactionID": f"TXN-{1000 + i}",
-            "Product": random.choice(products),
-            "Quantity": random.randint(1, 5),
-            "Price": random.randint(20, 500)
-        })
-    
-    # Pandas creates a 'DataFrame' (a digital spreadsheet)
-    df = pd.DataFrame(data)
-    # Save it to a CSV file
-    df.to_csv(filename, index=False)
-    print(f"Saved {rows} rows to {filename}")
+import pandas as pd
+
+
+# Quick sample dataset for testing inventory logic
+# Replace this later with live Zobaze export data when available
+def generate_dummy_sales(file_name="data/zobaze_sales_export.csv", num_records=50000):
+    print("Generating sample POS data...")
+
+    product_names = [
+        "Cardamom 100g",
+        "Basmati Rice 1kg",
+        "Tur Dal Loose",
+        "Lux Soap",
+        "Sugar 1kg",
+        "Tata Tea Gold",
+        "Aashirvaad Atta 5kg",
+    ]
+
+    records = []
+    for i in range(num_records):
+        records.append(
+            {
+                "txn_id": f"TXN-{1000 + i}",
+                "item_name": random.choice(product_names),
+                "qty": random.randint(1, 5),
+                "price": random.randint(20, 500),  # price in rupees
+            }
+        )
+
+    output_path = Path(file_name)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    sales_df = pd.DataFrame(records)
+    sales_df.to_csv(output_path, index=False)
+
+    print(f"Done. Saved {num_records} rows to {output_path}")
+
 
 if __name__ == "__main__":
-    generate_pos_data(),ṇ
+    generate_dummy_sales()
