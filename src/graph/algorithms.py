@@ -1,59 +1,58 @@
-# building out the category for the shop
-class NodeForCategory:
-    def __init__(self, cat_name, current_stock=0):
-        self.cat_name = cat_name
-        self.current_stock = current_stock
-        self.sub_cats = []
+# tracking the shop inventory  
+class MyCategoryTree:
+    def __init__(self, cat_title, amount_in_stock=0):
+        self.cat_title = cat_title
+        self.amount_in_stock = amount_in_stock
+        self.kids = [] # sub categories come here 
 
-    def push_child(self, child_obj):
-        self.sub_cats.append(child_obj)
+    def stick_child_in(self, kid_node):
+        self.kids.append(kid_node)
 
-def calc_total_inventory(node_item):
-    # recursive check to count stock down the tree
-    if node_item is None:
+def figure_out_total_stuff(node_thing):
+    if node_thing == None:
         return 0
         
-    running_total = node_item.current_stock
+    # start with what is in this exact category
+    sum_so_far = node_thing.amount_in_stock
     
-    for c in node_item.sub_cats:
-        running_total += calc_total_inventory(c)
+    # loop through subcats
+    for k in node_thing.kids:
+        sum_so_far = sum_so_far + figure_out_total_stuff(k)
         
-    return running_total
+    return sum_so_far
 
-def search_product_tree(top_node, what_to_find):
-    if not top_node:
+def go_find_an_item(the_root, search_string):
+    if the_root == None:
         return False
         
-    # using a basic list as a queue. pop(0) is slow but works for our scale
-    q = [top_node]
+    # simple list to hold stuff we need to check
+    stuff_to_check = [the_root]
     
-    while len(q) > 0:
-        checking_now = q.pop(0)
+    while len(stuff_to_check) > 0:
+        # grab first one
+        current_guy = stuff_to_check[0]
         
-        # TODO: need to fix case sensitivity later
-        if checking_now.cat_name == what_to_find:
-
-
+        # remove from the list manually
+        stuff_to_check = stuff_to_check[1:]
+        
+        if current_guy.cat_title == search_string:
             return True
             
-        for sub in checking_now.sub_cats:
-            q.append(sub)
+        for k in current_guy.kids:
+            stuff_to_check.append(k)
             
     return False
 
-#  test block
 if __name__ == '__main__':
-    root = NodeForCategory("Main Shop")
-    groc = NodeForCategory("Grocery section")
-    clean = NodeForCategory("Cleaning")
+    # check it works
+    r = MyCategoryTree("kirana main")
+    g = MyCategoryTree("grocery")
+    c = MyCategoryTree("cleaning stuff")
     
-    s = NodeForCategory("Lux Soap", 15)
-    d = NodeForCategory("Tur Dal Loose", 50)
-
+    s = MyCategoryTree("Lux Soap", 15)
+    d = MyCategoryTree("Tur Dal Loose", 50)
     
-    
-    clean.push_child(s)
-    groc.push_child(d)
-    root.push_child(groc)
-    root.push_child(clean)
-    
+    c.stick_child_in(s)
+    g.stick_child_in(d)
+    r.stick_child_in(g)
+    r.stick_child_in(c)
