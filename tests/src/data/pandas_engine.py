@@ -1,41 +1,41 @@
 import pandas as pd
 
+# threading crashed on me earlier so we are just slicing the data instead
+def process_sales_batch(batch_dataframe):
+    # calculating revenue per row first
+    batch_dataframe['total_rev'] = batch_dataframe['qty'] * batch_dataframe['price']
+    
+    # grouping it up by the product name
+    grouped_stats = batch_dataframe.groupby('item_name')['total_rev'].sum()
+    
+    return grouped_stats
 
-def analyze_sales_chunk(chunk_df):
-    chunk_df = chunk_df.copy()
-    chunk_df["total_revenue"] = chunk_df["qty"] * chunk_df["price"]
-    return chunk_df.groupby("item_name")["total_revenue"].sum()
-
-
-def get_data_chunks(filepath="data/zobaze_sales_export.csv", num_chunks=4):
-    if num_chunks < 1:
-        raise ValueError("num_chunks must be at least 1")
-
+def slice_data_up(path_to_csv="data/zobaze_sales_export.csv", splits=4):
+    print("fetching from:", path_to_csv)
+    
     try:
-        sales_df = pd.read_csv(filepath)
-    except FileNotFoundError:
-        print("Couldn't find the sales file. Run step1_Data.py first.")
+        raw_pos_data = pd.read_csv(path_to_csv)
+    except Exception as e:
+        print("failed to load file. did you run the step1 script?")
         return []
-
-    if sales_df.empty:
-        print("The sales file is empty.")
-        return []
-
-    if len(sales_df) <= num_chunks:
-        return [sales_df.copy()]
-
-    chunk_size = max(1, len(sales_df) // num_chunks)
-    chunks = [
-        sales_df.iloc[i:i + chunk_size].copy()
-        for i in range(0, len(sales_df), chunk_size)
-    ]
-
-    return chunks
-
+        
+    size_of_slice = len(raw_pos_data) // splits
+    sliced_pieces = []
+    
+    # using a while loop to slice the dataframe manually
+    start_idx = 0
+    while start_idx < len(raw_pos_data):
+        end_idx = start_idx + size_of_slice
+        piece = raw_pos_data.iloc[start_idx:end_idx].copy()
+        
+        sliced_pieces.append(piece)
+        start_idx += size_of_slice
+        
+    return sliced_pieces
 
 if __name__ == "__main__":
-    chunks = get_data_chunks()
-
-    if chunks:
-        print("\n--- Revenue by item in the first chunk ---")
-        print(analyze_sales_chunk(chunks[0]))
+    my_slices = slice_data_up()
+    
+    if len(my_slices) > 0:
+        print("testing slice 0:")
+        print(process_sales_batch(my_slices[0]))
