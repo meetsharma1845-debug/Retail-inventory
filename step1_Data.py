@@ -1,13 +1,12 @@
 import pandas as pd
 import random as rnd
 
-# gonna just make the data here to test the app
 def create_my_fake_sales_csv(name_of_file="data/zobaze_sales_export.csv", how_many_rows=50000):
     print("making data now wait a sec...")
     
     my_shop_items = ["Cardamom 100g", "Basmati Rice 1kg", "Tur Dal Loose", "Lux Soap", "Sugar 1kg", "Tata Tea Gold", "Aashirvaad Atta 5kg"]
     
-    # making separate lists instead of dicts cause it's easier to think about
+    # making separate lists 
     ids = []
     items = []
     qtys = []
@@ -21,7 +20,7 @@ def create_my_fake_sales_csv(name_of_file="data/zobaze_sales_export.csv", how_ma
         prices.append( rnd.randint(20, 500) )
         c = c + 1
         
-    # smush it all together into the dataframe
+    # smush it all together in dataframe
     final_table = pd.DataFrame({
         'txn_id': ids,
         'item_name': items,
